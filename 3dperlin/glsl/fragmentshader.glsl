@@ -198,18 +198,27 @@ void main() {
     // ensure it's normalized
     light = normalize(light);
 
+    float E = 0.001;
+    
+    float noise = cnoise(vPosition);
+
+    vec3 vPosX = vec3(vPosition.x + E, vPosition.y, vPosition.z);
+    vec3 vPosY = vec3(vPosition.x, vPosition.y + E, vPosition.z);
+    vec3 vPosZ = vec3(vPosition.x, vPosition.y, vPosition.z + E);
+    float noiseX = cnoise(vPosX);
+    float noiseY = cnoise(vPosY);
+    float noiseZ = cnoise(vPosZ);
+
+    vec3 dF = vec3((noiseX-noise)/E, (noiseY-noise)/E, (noiseZ-noise)/E);
+
     // calculate the dot product of
     // the light to the vertex normal
     float dProd = max(0.0,
-                    dot(vNormal, light));
-    
-    float noise = cnoise(vPosition)
-        + 0.5*cnoise(2.0*vPosition)
-        + 0.25*cnoise(4.0*vPosition);
+                    dot(normalize(vNormal-dF), light));
 
     // feed into our frag colour
-    gl_FragColor = vec4((noise)*dProd, // R
-                      (noise)*dProd, // G
-                      (noise)*dProd, // B
+    gl_FragColor = vec4(dProd, // R
+                      1.0*dProd, // G
+                      dProd, // B
                       1.0);  // A
 }

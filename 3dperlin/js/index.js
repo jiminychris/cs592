@@ -4,7 +4,7 @@ var $ = require('jquery');
 function main(vShader, fShader)
 {
     // set up the sphere vars
-    var radius = 100,
+    var radius = 20,
         segments = 16,
         rings = 16;
 
@@ -48,7 +48,7 @@ function main(vShader, fShader)
 
     // the camera starts at 0,0,0
     // so pull it back
-    camera.position.z = 300;
+    camera.position.z = 60;
 
     var frame = 0;
     function update()
