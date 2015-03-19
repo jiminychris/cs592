@@ -4,7 +4,7 @@ var $ = require('jquery');
 function main(vShader, fShader)
 {
     // set up the sphere vars
-    var radius = 50,
+    var radius = 100,
         segments = 16,
         rings = 16;
 
@@ -14,17 +14,9 @@ function main(vShader, fShader)
         FAR = 10000;
 
     var attributes = {
-        displacement: {
-            type: 'f',
-            value: []
-        }
     };
 
     var uniforms = {
-        amplitude: {
-            type: 'f',
-            value: 0
-        }
     }
 
     var shaderMaterial =
@@ -51,12 +43,6 @@ function main(vShader, fShader)
     var material = shaderMaterial; //new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     var sphere = new THREE.Mesh( geometry, material );
 
-    var verts = sphere.geometry.vertices;
-    var values = attributes.displacement.value;
-    for (var i = 0; i < verts.length; ++i) {
-        values.push(Math.random() * 30);
-    }
-
     scene.add( sphere );
 
 
@@ -67,7 +53,6 @@ function main(vShader, fShader)
     var frame = 0;
     function update()
     {
-        uniforms.amplitude.value = Math.sin(frame);
         frame += 0.1;
         renderer.render(scene, camera);
         requestAnimationFrame(update);

@@ -3,17 +3,15 @@
 precision highp float;
 #endif
 
-uniform float amplitude;
-attribute float displacement;
 varying vec3 vNormal;
+varying vec3 vPosition;
+uniform int p[512];
 
 void main() {
     vNormal = normal;
-
-    vec3 newPosition = position 
-        + normal * vec3(displacement * amplitude);
+    vPosition = position;
 
     gl_Position = projectionMatrix *
                 modelViewMatrix *
-                vec4(newPosition,1.0);
+                vec4(position,1.0);
 }
