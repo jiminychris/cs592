@@ -37,7 +37,11 @@
     "jquery": "./bower_components/jquery/dist/jquery.min.js"
   },
   "browserify-shim": {
-    "three": "three",
-    "jquery": "jquery"
+    "three": {
+      "exports": "THREE"
+    },
+    "jquery": {
+      "exports": "$"
+    }
   }
 }
