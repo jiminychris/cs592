@@ -47,7 +47,7 @@ function main(vShader, fShader)
     controls.domElement = container;
     controls.rollSpeed = Math.PI / 12;
     controls.autoForward = false;
-    controls.dragToLook = false;
+    controls.dragToLook = true;
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -72,36 +72,6 @@ function main(vShader, fShader)
             if (uniforms.mode.value == NUM_MODES)
                 uniforms.mode.value = 0;
         }
-        /*else if (e.keyCode == 119)
-        {
-            camera.position.z -= 1.0;
-            camera.updateMatrix();
-        }
-        else if (e.keyCode == 115)
-        {
-            camera.position.z += 1.0;
-            camera.updateMatrix();
-        }
-        else if (e.keyCode == 97)
-        {
-            camera.position.x -= 1.0;
-            camera.updateMatrix();
-        }
-        else if (e.keyCode == 100)
-        {
-            camera.position.x += 1.0;
-            camera.updateMatrix();
-        }
-        else if (e.keyCode == 106)
-        {
-            camera.rotation.y -= 0.1;
-            camera.updateMatrix();
-        }
-        else if (e.keyCode == 108)
-        {
-            camera.rotation.y += 0.1;
-            camera.updateMatrix();
-        }*/
     });
 
     var frame = 0;
