@@ -1,12 +1,14 @@
 var THREE = require('three');
 var $ = require('jquery');
+var FlyControls = require('./FlyControls');
 
 function main(vShader, fShader)
 {
+    var clock = new THREE.Clock();
     // set up the sphere vars
     var radius = 20,
-        segments = 16,
-        rings = 16;
+        segments = 40,
+        rings = 40;
 
     var VIEW_ANGLE = 45,
         ASPECT = window.innerWidth / window.innerHeight,
@@ -39,6 +41,13 @@ function main(vShader, fShader)
         ASPECT,
         NEAR,
         FAR);
+    var controls = new FlyControls(camera);
+
+    controls.movementSpeed = 50;
+    controls.domElement = container;
+    controls.rollSpeed = Math.PI / 12;
+    controls.autoForward = false;
+    controls.dragToLook = false;
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -55,17 +64,51 @@ function main(vShader, fShader)
     // so pull it back
     camera.position.z = 60;
 
-    $(window).keypress(function()
+    $(window).keypress(function(e)
     {
-        uniforms.mode.value += 1;
-        if (uniforms.mode.value == NUM_MODES)
-            uniforms.mode.value = 0;
+        if (e.keyCode == 32)
+        {
+            uniforms.mode.value += 1;
+            if (uniforms.mode.value == NUM_MODES)
+                uniforms.mode.value = 0;
+        }
+        /*else if (e.keyCode == 119)
+        {
+            camera.position.z -= 1.0;
+            camera.updateMatrix();
+        }
+        else if (e.keyCode == 115)
+        {
+            camera.position.z += 1.0;
+            camera.updateMatrix();
+        }
+        else if (e.keyCode == 97)
+        {
+            camera.position.x -= 1.0;
+            camera.updateMatrix();
+        }
+        else if (e.keyCode == 100)
+        {
+            camera.position.x += 1.0;
+            camera.updateMatrix();
+        }
+        else if (e.keyCode == 106)
+        {
+            camera.rotation.y -= 0.1;
+            camera.updateMatrix();
+        }
+        else if (e.keyCode == 108)
+        {
+            camera.rotation.y += 0.1;
+            camera.updateMatrix();
+        }*/
     });
 
     var frame = 0;
     function update()
     {
-        frame += 0.1;
+        var delta = clock.getDelta();
+        controls.update(delta);
         renderer.render(scene, camera);
         requestAnimationFrame(update);
     }
