@@ -6,6 +6,7 @@ precision highp float;
 // same name and type as VS
 varying vec3 vNormal;
 varying vec3 vPosition;
+uniform int mode;
 
 // switch on high precision floats
 #ifdef GL_ES
@@ -190,16 +191,8 @@ float pnoise(vec3 P, vec3 rep)
   return 2.2 * n_xyz;
 }
 
-void main() {
-    // calc the dot product and clamp
-    // 0 -> 1 rather than -1 -> 1
-    vec3 light = vec3(0.5, 0.2, 1.0);
-
-    // ensure it's normalized
-    light = normalize(light);
-
-    float E = 0.001;
-    
+void mode0(vec3 light)
+{
     float xPeriod = 5.0;
     float yPeriod = 10.0;
     float zPeriod = 8.0;
@@ -215,15 +208,6 @@ void main() {
         + turbPower * noise;
     noise = abs(sin(noise * 3.14159));
 
-    /*vec3 vPosX = vec3(vPosition.x + E, vPosition.y, vPosition.z);
-    vec3 vPosY = vec3(vPosition.x, vPosition.y + E, vPosition.z);
-    vec3 vPosZ = vec3(vPosition.x, vPosition.y, vPosition.z + E);
-    float noiseX = cnoise(vPosX);
-    float noiseY = cnoise(vPosY);
-    float noiseZ = cnoise(vPosZ);
-
-    vec3 dF = vec3((noiseX-noise)/E, (noiseY-noise)/E, (noiseZ-noise)/E);*/
-
     // calculate the dot product of
     // the light to the vertex normal
     float dProd = max(0.0,
@@ -234,4 +218,49 @@ void main() {
                         1.0*dProd*noise, // G
                         1.0*dProd*noise, // B
                         1.0);      // A
+}
+
+void mode1(vec3 light)
+{
+    float noise = cnoise(vPosition);
+
+    float E = 0.001;
+
+    vec3 vPosX = vec3(vPosition.x + E, vPosition.y, vPosition.z);
+    vec3 vPosY = vec3(vPosition.x, vPosition.y + E, vPosition.z);
+    vec3 vPosZ = vec3(vPosition.x, vPosition.y, vPosition.z + E);
+    float noiseX = cnoise(vPosX);
+    float noiseY = cnoise(vPosY);
+    float noiseZ = cnoise(vPosZ);
+
+    vec3 dF = vec3((noiseX-noise)/E, (noiseY-noise)/E, (noiseZ-noise)/E);
+
+    // calculate the dot product of
+    // the light to the vertex normal
+    float dProd = max(0.0,
+                    dot(normalize(vNormal-dF), light));
+
+    // feed into our frag colour
+    gl_FragColor = vec4(0.0*dProd, // R
+                        1.0*dProd, // G
+                        0.0*dProd, // B
+                        1.0);      // A
+}
+
+void main() {
+    // calc the dot product and clamp
+    // 0 -> 1 rather than -1 -> 1
+    vec3 light = vec3(0.5, 0.2, 1.0);
+
+    // ensure it's normalized
+    light = normalize(light);
+    
+    if (mode == 0)
+    {
+        mode0(light);
+    }
+    else if (mode == 1)
+    {
+        mode1(light);
+    }
 }

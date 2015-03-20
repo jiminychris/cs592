@@ -17,7 +17,12 @@ function main(vShader, fShader)
     };
 
     var uniforms = {
-    }
+        mode: {
+            type: 'i',
+            value: 0
+        }
+    };
+    NUM_MODES = 2;
 
     var shaderMaterial =
       new THREE.ShaderMaterial({
@@ -49,6 +54,13 @@ function main(vShader, fShader)
     // the camera starts at 0,0,0
     // so pull it back
     camera.position.z = 60;
+
+    $(window).keypress(function()
+    {
+        uniforms.mode.value += 1;
+        if (uniforms.mode.value == NUM_MODES)
+            uniforms.mode.value = 0;
+    });
 
     var frame = 0;
     function update()
