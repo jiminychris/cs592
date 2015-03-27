@@ -9,14 +9,14 @@ function main()
     var clock = new THREE.Clock();
     var timer = new THREE.Clock(false);
     // set up the plane vars
-    var planeWidth = 20;
+    var planeWidth = 10;
     var planeHeight = planeWidth;
-    var segments = planeWidth * 10;
+    var segments = planeWidth*5;
 
     var VIEW_ANGLE = 45,
         ASPECT = window.innerWidth / window.innerHeight,
         NEAR = 0.1,
-        FAR = 10000;
+        FAR = 100000000000;
 
     var scene = new THREE.Scene();
     var camera =
@@ -33,33 +33,51 @@ function main()
     controls.autoForward = false;
     controls.dragToLook = true;
 
-    var renderer = new THREE.WebGLRenderer();
+    var renderer = new THREE.WebGLRenderer({
+        //antialiasing: true
+    });
+    //renderer.shadowMapEnabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
     var geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, segments, segments);
     var material = new THREE.MeshPhongMaterial({
         color: 0xEDD46D,
+        shininess: .0001,
+        emissive: 0x111001,
+        metal: false,
+        shading: THREE.SmoothShading
         /*wireframe: true*/
     });
 
-    for (var i = 0; i < geometry.vertices.length; ++i)
-    {
-        var vertex = geometry.vertices[i];
-        var noise = noise3d(0.25*vertex.x, 0.25*vertex.y, 0.0)
-            + 0.5 * noise3d(0.5*vertex.x, 0.5*vertex.y, 0.0)
-            + 0.25      * noise3d(vertex.x, vertex.y, 0.0)
-            + 0.125     * noise3d(2*vertex.x, 2*vertex.y, 0.0);
-        vertex.z = noise;
-    }
-    var plane = new THREE.Mesh( geometry, material );
+    var sunGeometry = new THREE.SphereGeometry(695800000);
+    var sunMaterial = new THREE.MeshBasicMaterial({
+        color: 0xFFFFFF,
+        /*wireframe: true*/
+    });
+
+    var plane = new THREE.Mesh(geometry, material);
+    //plane.castShadow = true;
+    //plane.receiveShadow = true;
     plane.rotation.x = -Math.PI / 2.0;
 
-    var light = new THREE.PointLight(0xFFFFFF, 4, 0);
-    light.position.set(15, 4, 15);
+    var lightPos = new THREE.Vector3(15, 4, -15).normalize().multiplyScalar(149600000000);
+    var light = new THREE.PointLight(0xFFFFFF, 1);
+    light.position.copy(lightPos);
+
+    var sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    sun.position.copy(lightPos);
+    var sunAxis = new THREE.Vector3(-15, 0, 15);
+
+    var ambient = new THREE.AmbientLight(0x202020);
+
+    //var edges = new THREE.VertexNormalsHelper(plane, 2, 0x00ff00, 1);
 
     scene.add(plane);
+    scene.add(sun);
     scene.add(light);
+    scene.add(ambient);
+    //scene.add(edges);
 
     camera.position.z = 10;
     camera.position.y = 1.5;
@@ -75,24 +93,13 @@ function main()
             {
                 timer.stop();
                 material.color.setHex(0xEDD46D);
-
-                for (var i = 0; i < geometry.vertices.length; ++i)
-                {
-                    var vertex = geometry.vertices[i];
-                    var noise = noise3d(0.25*vertex.x, 0.25*vertex.y, 0.0)
-                        + 0.5   * noise3d(0.5*vertex.x, 0.5*vertex.y, 0.0)
-                        + 0.25  * noise3d(vertex.x, vertex.y, 0.0)
-                        + 0.125 * noise3d(2*vertex.x, 2*vertex.y, 0.0);
-                    vertex.z = noise;
-                }
-                material.needsUpdate = true;
-                geometry.verticesNeedUpdate = true;
+                //material.needsUpdate = true;
             }
             else if (mode == 1)
             {
                 timer.start();
                 material.color.setHex(0x19CFE3);
-                material.needsUpdate = true;
+                //material.needsUpdate = true;
             }
         }
     });
@@ -100,22 +107,23 @@ function main()
     var frame = 0;
     function update()
     {
-
         var delta = clock.getDelta();
         var elapsedTime = timer.getElapsedTime();
         for (var i = 0; i < geometry.vertices.length; ++i)
         {
             var vertex = geometry.vertices[i];
-            var noise = 4.0      * noise3d(0.03125*vertex.x, 0.03125*vertex.y, 0.03125*elapsedTime)
-                      + 1.0     * noise3d(0.125*vertex.x, 0.125*vertex.y, 0.125*elapsedTime)
-                      + 0.25   * noise3d(0.5*vertex.x, 0.5*vertex.y, 0.5*elapsedTime)
-                      + 0.0625 * noise3d(2.0*vertex.x, 2.0*vertex.y, 2.0*elapsedTime);
-            vertex.z = noise;
+            vertex.setZ(terrainHeight(vertex.x, vertex.y, elapsedTime));
         }
-        if (mode == 1)
-        {
-            geometry.verticesNeedUpdate = true;
-        }
+        geometry.computeFaceNormals();
+        geometry.computeVertexNormals();
+
+        geometry.verticesNeedUpdate = true;
+        geometry.normalsNeedUpdate = true;
+
+        //var q = new THREE.Quaternion().setFromAxisAngle( sunAxis, .1 );
+        //sun.rotation.setEulerFromQuaternion( q );
+        //light.rotation.setEulerFromQuaternion( q );
+        //edges.update();
         controls.update(delta);
         renderer.render(scene, camera);
         requestAnimationFrame(update);
@@ -127,6 +135,24 @@ $(document).ready(function() {
     main();
 });
 
+function terrainHeight(x, y, t)
+{
+    var persistence = 2;
+    var amplitudeOffset = -2;
+    var frequencyOffset = 1;
+    var detail = 4;
+    
+    height = 0;
+
+    for (var i = 0; i < detail; ++i)
+    {
+        var amplitude = Math.pow(persistence, i + amplitudeOffset);
+        var frequency = Math.pow(persistence, i + frequencyOffset)
+        var noise = noise3d(x / frequency, y / frequency, t / frequency);
+        height += amplitude * noise;
+    }
+    return Math.pow(3, height);
+}
 
 var permutation = [
     151,160,137, 91, 90, 15,131, 13,201, 95, 96, 53,194,233,  7,225,140, 36,
