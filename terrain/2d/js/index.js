@@ -176,9 +176,10 @@ function terrainHeight(x, y, t)
         var noise = Noise.noise3d(x / frequency, y / frequency, t / frequency);
         height += amplitude * noise;
     }
-    return Math.pow(3, height);
+    return 2*Math.pow(3, height);
 }
 
 $(document).ready(function() {
     main();
 });
+
