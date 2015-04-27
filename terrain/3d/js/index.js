@@ -2,7 +2,7 @@ var THREE = require('three');
 var $ = require('jquery');
 var FlyControls = require('./FlyControls');
 var Noise = require('./Noise');
-var IcosahedronTree = require('./IcosahedronTree');
+var ExpandingIcosahedron = require('./ExpandingIcosahedron');
 
 var PLANET_RADIUS = 6371000;
 var CAMERA_SPEED = 10000000;
@@ -29,8 +29,9 @@ function main()
     document.body.appendChild(renderer.domElement);
     //var edges = new THREE.VertexNormalsHelper(planet, 2, 0x00ff00, 1);
     //scene.add(edges);
-    var geometry = planet.geometry;
-    planet.update(camera.position);
+    scene.add(planet.update(camera.position));
+    console.log(planet.mesh.geometry.vertices,
+        planet.mesh.geometry.faces);
     // for (var j = 0; j < 5; ++j)
     // {
     //     var faces = geometry.faces.slice();
@@ -92,18 +93,18 @@ function initPlanet(scene)
     {
         boundaries.push(Math.pow(2, i));
     }
-    var material = new THREE.MeshPhongMaterial({
+    var material = new THREE.MeshNormalMaterial({
         color: 0xEDD46D,
         shininess: .0001,
         shading: THREE.SmoothShading,
         wireframe: true
     });
-    var tree = new IcosahedronTree.IcosahedronTree(PLANET_RADIUS,
-        boundaries, 
-        terrainHeight,
-        material);
+    var ico = new ExpandingIcosahedron.ExpandingIcosahedron(
+        boundaries,
+        material,
+        terrainHeight);
 
-    return tree;
+    return ico;
 }
 
 function initLight(scene)
