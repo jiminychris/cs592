@@ -2,9 +2,14 @@ var THREE = require('three');
 var $ = require('jquery');
 var FlyControls = require('./FlyControls');
 var Noise = require('./Noise');
+var IcosahedronTree = require('./IcosahedronTree');
 
 var PLANET_RADIUS = 6371000;
-var CAMERA_SPEED = 1000000;
+var CAMERA_SPEED = 10000000;
+
+$(document).ready(function() {
+    main();
+});
 
 function main()
 {
@@ -17,20 +22,32 @@ function main()
     var controls = initCamera(scene);
     var camera = controls.object;
 
-
     var renderer = new THREE.WebGLRenderer();
     //renderer.shadowMapEnabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     document.body.appendChild(renderer.domElement);
-
     //var edges = new THREE.VertexNormalsHelper(planet, 2, 0x00ff00, 1);
     //scene.add(edges);
+    var geometry = planet.geometry;
+    planet.update(camera.position);
+    // for (var j = 0; j < 5; ++j)
+    // {
+    //     var faces = geometry.faces.slice();
+    //     for (var i = 0; i < faces.length; ++i)
+    //     {
+    //         increaseDetail(geometry, geometry.faces.indexOf(faces[i]));
+    //     }
+    // }
+
+    //lod_faces = geometry.
 
     function update()
     {
-        var geometry = planet.geometry;
         var delta = clock.getDelta();
+        scene.remove(planet.mesh);
+        scene.add(planet.update(camera.position));
+        /*var geometry = planet.geometry;
         for (var i = 0; i < geometry.vertices.length; ++i)
         {
             var vertex = geometry.vertices[i];
@@ -46,13 +63,16 @@ function main()
         geometry.computeVertexNormals();
 
         geometry.verticesNeedUpdate = true;
-        geometry.normalsNeedUpdate = true;
+        geometry.normalsNeedUpdate = true;*/
 
         //var q = new THREE.Quaternion().setFromAxisAngle( sunAxis, .1 );
         //sun.rotation.setEulerFromQuaternion( q );
         //light.rotation.setEulerFromQuaternion( q );
         //edges.update();
         controls.update(delta);
+
+        controls.movementSpeed = 15+planet.nearestDistance/1;
+
         renderer.render(scene, camera);
         requestAnimationFrame(update);
     }
@@ -61,20 +81,25 @@ function main()
 
 function initPlanet(scene)
 {
-    var detail = 6;
-    var geometry = new THREE.IcosahedronGeometry(PLANET_RADIUS, detail);
+    var boundaries = [];
+    for (var i = 25; i >= 0; --i)
+    {
+        boundaries.push(Math.pow(2, i));
+    }
     var material = new THREE.MeshPhongMaterial({
         color: 0xEDD46D,
         shininess: .0001,
-        shading: THREE.SmoothShading
-        /*wireframe: true*/
+        shading: THREE.SmoothShading,
+        //wireframe: true
     });
+    var tree = new IcosahedronTree.IcosahedronTree(PLANET_RADIUS,
+        boundaries, 
+        terrainHeight,
+        material);
 
-    var planet = new THREE.Mesh(geometry, material);
+    scene.add(tree.mesh);
 
-    scene.add(planet);
-
-    return planet;
+    return tree;
 }
 
 function initLight(scene)
@@ -85,7 +110,7 @@ function initLight(scene)
     var lightColor = 0xFFFFFF;
     var ambientColor = 0x202020;
     var lightIntensity = 1;
-    var lightPos = new THREE.Vector3(15, 4, -15).normalize().multiplyScalar(sunDistance);
+    var lightPos = new THREE.Vector3(15, 4, 15).normalize().multiplyScalar(sunDistance);
 
     var sunGeometry = new THREE.SphereGeometry(sunRadius);
     var sunMaterial = new THREE.MeshBasicMaterial({
@@ -124,7 +149,7 @@ function initCamera()
         ASPECT,
         NEAR,
         FAR);
-    camera.position.y = PLANET_RADIUS + 1.5;
+    camera.position.z = PLANET_RADIUS * 5;// + 1.5;
     var controls = new FlyControls(camera);
 
     controls.movementSpeed = CAMERA_SPEED;
@@ -136,26 +161,34 @@ function initCamera()
     return controls;
 }
 
-function terrainHeight(x, y, t)
+function terrainHeight(vertex, lod)
 {
+    vertex.normalize().multiplyScalar(PLANET_RADIUS);
+    var x = vertex.x;
+    var y = vertex.y;
+    var z = vertex.z;
     var persistence = 2;
-    var amplitudeOffset = -2;
-    var frequencyOffset = 1;
-    var detail = 4;
+    var amplitudeOffset = 0;
+    var frequencyOffset = 2;
+    var max_amplitude = Math.log(10000) / Math.log(persistence);
+    var detail = /*2**/(lod + 1);
     
     height = 0;
 
     for (var i = 0; i < detail; ++i)
     {
-        var amplitude = Math.pow(persistence, i + amplitudeOffset);
-        var frequency = Math.pow(persistence, i + frequencyOffset)
-        var noise = Noise.noise3d(x / frequency, y / frequency, t / frequency);
+        var d = max_amplitude - i;
+        var amplitude = Math.pow(persistence, d + amplitudeOffset);
+        var frequency = Math.pow(persistence, d + frequencyOffset)
+        var noise = Noise.noise3d(x / frequency, y / frequency, z / frequency);
         height += amplitude * noise;
     }
-    return Math.pow(height * 18, 3);
+    var newLength = PLANET_RADIUS + height;
+    var transform = newLength / PLANET_RADIUS;
+    vertex.setX(vertex.x * transform);
+    vertex.setY(vertex.y * transform);
+    vertex.setZ(vertex.z * transform);
 }
 
-$(document).ready(function() {
-    main();
-});
+
 

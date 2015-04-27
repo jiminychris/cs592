@@ -1,0 +1,29 @@
+{
+    "folders":
+    [
+        {
+            "path": "js",
+        },
+        {
+            "path": ".",
+            "name": "html",
+            "file_include_patterns":
+            [
+                "index.html"
+            ],
+            "folder_exclude_patterns":
+            [
+                "*"
+            ]
+        }
+    ],
+    "build_systems":
+    [
+        {
+            "name": "browserify",
+            "cmd": ["browserify", "js/index.js", "-o", "bundle.js"],
+            "working_dir": "${project_path}",
+            "path": "/usr/local/bin/"
+        }
+    ]
+}

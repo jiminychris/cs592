@@ -2,5 +2,6 @@ bower_components
 node_modules
 bundle.js
 Mongoose.app/
+*.sublime-workspace
 *.exe
 *.swp
