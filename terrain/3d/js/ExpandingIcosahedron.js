@@ -125,11 +125,6 @@ function createGeometry(ico) {
     }
     geometry.faces = [];
 
-    geometry.computeFaceNormals();
-    geometry.computeVertexNormals();
-    geometry.verticesNeedUpdate = true;
-    geometry.normalsNeedUpdate = true;
-
     var seen = [];
     for (var i = 0; i < ico.nodes.length; ++i)
         seen.push(false);
@@ -157,6 +152,11 @@ function createGeometry(ico) {
 
         seen[i] = true;
     }
+
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+    geometry.verticesNeedUpdate = true;
+    geometry.normalsNeedUpdate = true;
 
     return geometry;
 }

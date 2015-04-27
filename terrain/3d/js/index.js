@@ -93,7 +93,7 @@ function initPlanet(scene)
     {
         boundaries.push(Math.pow(2, i));
     }
-    var material = new THREE.MeshNormalMaterial({
+    var material = new THREE.MeshPhongMaterial({
         color: 0xEDD46D,
         shininess: .0001,
         shading: THREE.SmoothShading,
