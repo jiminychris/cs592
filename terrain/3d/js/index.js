@@ -40,7 +40,13 @@ function main()
     //     }
     // }
 
-    //lod_faces = geometry.
+    $(window).keypress(function(e)
+    {
+        if (e.keyCode == 32)
+        {
+            planet.toggleWireframe();
+        }
+    });
 
     function update()
     {
@@ -90,7 +96,7 @@ function initPlanet(scene)
         color: 0xEDD46D,
         shininess: .0001,
         shading: THREE.SmoothShading,
-        //wireframe: true
+        wireframe: true
     });
     var tree = new IcosahedronTree.IcosahedronTree(PLANET_RADIUS,
         boundaries, 
@@ -171,7 +177,7 @@ function terrainHeight(vertex, lod)
     var amplitudeOffset = 0;
     var frequencyOffset = 2;
     var max_amplitude = Math.log(10000) / Math.log(persistence);
-    var detail = /*2**/(lod + 1);
+    var detail = /*2**/10+(lod + 1);
     
     height = 0;
 

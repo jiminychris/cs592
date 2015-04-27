@@ -5,6 +5,7 @@ function IcosahedronTree(radius, boundaries, transform, material)
     this.geometry = new THREE.IcosahedronGeometry(radius);
     this.mesh = new THREE.Mesh(this.geometry, material);
     this.material = material;
+    material.wireframe = false;
     this.radius = radius;
     this.boundaries = boundaries;
     this.transform = transform;
@@ -17,6 +18,10 @@ function IcosahedronTree(radius, boundaries, transform, material)
     }
     for (var i = 0; i < this.geometry.faces.length; ++i)
         this.faces.push(new IcosahedronNode(this, this.geometry.faces[i], 0));
+}
+
+IcosahedronTree.prototype.toggleWireframe = function (argument) {
+    this.material.wireframe = !this.material.wireframe;
 }
 
 IcosahedronTree.prototype.update = function(position) {
@@ -80,7 +85,7 @@ IcosahedronNode.prototype.update = function (position) {
     //console.log(boundary, distance);
     if (distance > boundary)
     {
-        if (this.children.length > 0 && this.depth > 0)
+        if (this.children.length > 0 && this.depth > 1)
         {
             this.root.geometry.faces.push(this.face);
             for (var i = 0; i < this.children.length; ++i)
