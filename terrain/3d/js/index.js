@@ -103,8 +103,6 @@ function initPlanet(scene)
         terrainHeight,
         material);
 
-    scene.add(tree.mesh);
-
     return tree;
 }
 
