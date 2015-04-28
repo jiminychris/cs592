@@ -88,11 +88,12 @@ function main()
 
 function initPlanet(scene)
 {
-    var boundaries = [];
+    /*var boundaries = [];
     for (var i = 25; i >= 0; --i)
     {
         boundaries.push(Math.pow(2, i));
-    }
+    }*/
+    var boundaries = [PLANET_RADIUS];
     var material = new THREE.MeshPhongMaterial({
         color: 0xEDD46D,
         shininess: .0001,
