@@ -4,7 +4,8 @@ var FlyControls = require('./FlyControls');
 var Noise = require('./Noise');
 var IcosahedronTree = require('./IcosahedronTree');
 
-var PLANET_RADIUS = 6371000;
+var PLANET_RADIUS = 3390000;
+var PLANET_COLOR = 0xD46622;
 var CAMERA_SPEED = 10000000;
 
 $(document).ready(function() {
@@ -88,12 +89,12 @@ function main()
 function initPlanet(scene)
 {
     var boundaries = [];
-    for (var i = 24; i >= 0; --i)
+    for (var i = 23; i >= 0; --i)
     {
         boundaries.push(Math.pow(2.05, i));
     }
     var material = new THREE.MeshPhongMaterial({
-        color: 0xEDD46D,
+        color: PLANET_COLOR,
         shininess: .0001,
         shading: THREE.SmoothShading,
         wireframe: true
@@ -109,7 +110,7 @@ function initPlanet(scene)
 function initLight(scene)
 {
     var sunRadius = 695800000;
-    var sunDistance = 149600000000;
+    var sunDistance = 227900000000;
     var sunColor = 0xFFFFFF;
     var lightColor = 0xFFFFFF;
     var ambientColor = 0x202020;
