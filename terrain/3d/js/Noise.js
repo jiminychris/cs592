@@ -21,6 +21,14 @@ for (var i=0; i < 256*2 ; i++)
     p.push(permutation[i % 256]);
 }
 
+var _seed = 1;
+function stream(seed) {
+    if (seed !== undefined)
+        _seed = seed;
+    var x = Math.sin(_seed++) * 10000;
+    return x - Math.floor(x);
+}
+
 function noise3d(x, y, z) {
     var X = Math.floor(x) & 255,                  // FIND UNIT CUBE THAT
         Y = Math.floor(y) & 255,                  // CONTAINS POINT.
@@ -53,5 +61,6 @@ function grad(hash, x, y, z) {
 }
 
 module.exports = {
+    stream: stream,
     noise3d: noise3d
 };

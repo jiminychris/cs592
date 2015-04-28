@@ -170,40 +170,34 @@ function initCamera()
 
 function initStars(scene)
 {
+    var seed = .9230975;
+    //var numStars = 3 * Math.pow(10, 11) + (Noise.stream(seed)*2-1) * Math.pow(1, 11);
+    var numStars = 3 * Math.pow(10, 3) + (Noise.stream(seed)*2-1) * Math.pow(10, 3);
     var stars = [];
     var smallest_r = 167000000;
-    var largest_r = 695500000 * 150000; //flubbed for visibility, should be *1500
-    var num_light_years = 100;
-    var chance = .2;
-    var avg_star_distance = 5;
-    var size = num_light_years / avg_star_distance;
-    var half_size = size / 2;
+    var largest_r = 695500000 * 1500;
+    var avg_star_distance = .4; // actually about 5
+    var star_distance_deviation = .2; // made up
+    var galaxy_radius_ly = 50000;
     var ly_to_m = 9.4605284 * Math.pow(10, 15);
-    for (var i = -half_size; i < half_size; ++i)
-    {
-        for (var j = -half_size; j < half_size; ++j)
-        {
-            for (var k = -half_size; k < half_size; ++k)
-            {
-                var x = i * avg_star_distance * ly_to_m;
-                var y = j * avg_star_distance * ly_to_m;
-                var z = k * avg_star_distance * ly_to_m;
-                var roll = Math.abs(Noise.noise3d((i/size)+.5, (j/size)+.5, (k/size)+.5));
-                console.log(roll);
-                if (roll > chance) continue;
-                var size_ratio = roll / chance;
-                var radius = smallest_r + (largest_r - smallest_r) * size_ratio;
 
-                var starGeometry = new THREE.SphereGeometry(radius);
-                var starMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xFFFFFF
-                });
-                star = new THREE.Mesh(starGeometry, starMaterial);
-                star.position.set(x, y, z);
-                scene.add(star);
-                stars.push(star);
-            }
-        }
+    for (var i = 0; i < numStars; ++i)
+    {
+        var d = (avg_star_distance + Noise.stream() * star_distance_deviation) * ly_to_m;
+        var x = (Noise.stream()*2-1);
+        var y = (Noise.stream()*2-1);
+        var z = (Noise.stream()*2-1);
+        var radius = smallest_r + Noise.stream() * (largest_r - smallest_r);
+        console.log(x, y, z, radius);
+
+        var starGeometry = new THREE.SphereGeometry(radius);
+        var starMaterial = new THREE.MeshBasicMaterial({
+            color: 0xFFFFFF
+        });
+        star = new THREE.Mesh(starGeometry, starMaterial);
+        star.position.set(x, y, z).multiplyScalar(d);
+        scene.add(star);
+        stars.push(star);
     }
 
     return stars;
