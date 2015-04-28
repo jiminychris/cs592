@@ -88,9 +88,9 @@ function main()
 function initPlanet(scene)
 {
     var boundaries = [];
-    for (var i = 25; i >= 0; --i)
+    for (var i = 24; i >= 0; --i)
     {
-        boundaries.push(Math.pow(2, i));
+        boundaries.push(Math.pow(2.05, i));
     }
     var material = new THREE.MeshPhongMaterial({
         color: 0xEDD46D,
@@ -172,8 +172,8 @@ function terrainHeight(vertex, lod)
     var y = vertex.y;
     var z = vertex.z;
     var persistence = 2;
-    var amplitudeOffset = 0;
-    var frequencyOffset = 2;
+    var amplitudeOffset = 3;
+    var frequencyOffset = 5;
     var max_amplitude = Math.log(10000) / Math.log(persistence);
     var detail = /*2**/10+(lod + 1);
     
