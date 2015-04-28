@@ -20,6 +20,8 @@ function main()
 
     var planet = initPlanet(scene);
     var light = initLight(scene);
+    var stars = initStars(scene);
+    console.log(stars.length);
     var controls = initCamera(scene);
     var camera = controls.object;
 
@@ -164,6 +166,47 @@ function initCamera()
     controls.dragToLook = true;
 
     return controls;
+}
+
+function initStars(scene)
+{
+    var stars = [];
+    var smallest_r = 167000000;
+    var largest_r = 695500000 * 150000; //flubbed for visibility, should be *1500
+    var num_light_years = 100;
+    var chance = .2;
+    var avg_star_distance = 5;
+    var size = num_light_years / avg_star_distance;
+    var half_size = size / 2;
+    var ly_to_m = 9.4605284 * Math.pow(10, 15);
+    for (var i = -half_size; i < half_size; ++i)
+    {
+        for (var j = -half_size; j < half_size; ++j)
+        {
+            for (var k = -half_size; k < half_size; ++k)
+            {
+                var x = i * avg_star_distance * ly_to_m;
+                var y = j * avg_star_distance * ly_to_m;
+                var z = k * avg_star_distance * ly_to_m;
+                var roll = Math.abs(Noise.noise3d((i/size)+.5, (j/size)+.5, (k/size)+.5));
+                console.log(roll);
+                if (roll > chance) continue;
+                var size_ratio = roll / chance;
+                var radius = smallest_r + (largest_r - smallest_r) * size_ratio;
+
+                var starGeometry = new THREE.SphereGeometry(radius);
+                var starMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xFFFFFF
+                });
+                star = new THREE.Mesh(starGeometry, starMaterial);
+                star.position.set(x, y, z);
+                scene.add(star);
+                stars.push(star);
+            }
+        }
+    }
+
+    return stars;
 }
 
 function terrainHeight(vertex, lod)

@@ -23,7 +23,13 @@
             "name": "browserify",
             "cmd": ["browserify", "js/index.js", "-o", "bundle.js"],
             "working_dir": "${project_path}",
-            "path": "/usr/local/bin/"
+            "path": "/usr/local/bin/",
+
+            "windows":
+            {
+                "cmd": ["browserify.cmd", "js/index.js", "-o", "bundle.js"],
+                "path": "C:\\Users\\clabauve\\AppData\\Roaming\\npm;C:\\Program Files\\nodejs"
+            }
         }
     ]
 }
