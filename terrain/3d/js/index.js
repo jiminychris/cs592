@@ -101,10 +101,19 @@ function ly_to_m(ly) {
 
 function initPlanet(scene)
 {
-    var boundaries = [];
-    for (var i = 23; i >= 0; --i)
+    /*var boundaries = [];
+    for (var i = 26; i >= 13; --i)
     {
-        boundaries.push(Math.pow(2.05, i));
+        boundaries.push(Math.pow(1.90, i));
+    }*/
+    boundaries = [
+        PLANET_RADIUS*200, 
+        PLANET_RADIUS*100, 
+        PLANET_RADIUS*80,
+        PLANET_RADIUS*1.2]
+    for (var i = 1; i < 14; ++i)
+    {
+        boundaries.push(PLANET_RADIUS/Math.pow(2, i));
     }
     var material = new THREE.MeshPhongMaterial({
         color: PLANET_COLOR,
@@ -220,7 +229,7 @@ function terrainHeight(vertex, lod)
     var amplitudeOffset = 3;
     var frequencyOffset = 5;
     var max_amplitude = Math.log(10000) / Math.log(persistence);
-    var detail = /*2**/10+(lod + 1);
+    var detail = 1.5*(lod + 2);
     
     height = 0;
 
