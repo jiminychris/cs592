@@ -7,6 +7,8 @@ var IcosahedronTree = require('./IcosahedronTree');
 var PLANET_RADIUS = 3390000;
 var PLANET_COLOR = 0xD46622;
 var CAMERA_SPEED = 10000000;
+var AVG_STAR_DIST = .2; // actually about 5
+var STAR_DIST_DEV = .1; // made up
 
 $(document).ready(function() {
     main();
@@ -21,7 +23,6 @@ function main()
     var planet = initPlanet(scene);
     var light = initLight(scene);
     var stars = initStars(scene);
-    console.log(stars.length);
     var controls = initCamera(scene);
     var camera = controls.object;
 
@@ -48,6 +49,11 @@ function main()
         if (e.keyCode == 32)
         {
             planet.toggleWireframe();
+        }
+        else if (e.keyCode == 13)
+        {
+            camera.position.set(0, 0, PLANET_RADIUS*5);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
         }
     });
 
@@ -88,6 +94,11 @@ function main()
     requestAnimationFrame(update);
 }
 
+function ly_to_m(ly) {
+    return ly * 9.4605284 * Math.pow(10, 15)
+};
+
+
 function initPlanet(scene)
 {
     var boundaries = [];
@@ -113,7 +124,7 @@ function initLight(scene)
 {
     var sunRadius = 695800000;
     var sunDistance = 227900000000;
-    var sunColor = 0xFFFFFF;
+    var sunColor = 0xFFE95C;
     var lightColor = 0xFFFFFF;
     var ambientColor = 0x202020;
     var lightIntensity = 1;
@@ -147,8 +158,8 @@ function initCamera()
 {
     var VIEW_ANGLE = 45,
         ASPECT = window.innerWidth / window.innerHeight,
-        NEAR = 0.1,
-        FAR = 100000000000;
+        NEAR = 0.01,
+        FAR = ly_to_m((AVG_STAR_DIST + STAR_DIST_DEV)*2);
 
     var camera =
       new THREE.PerspectiveCamera(
@@ -176,19 +187,15 @@ function initStars(scene)
     var stars = [];
     var smallest_r = 167000000;
     var largest_r = 695500000 * 1500;
-    var avg_star_distance = .4; // actually about 5
-    var star_distance_deviation = .2; // made up
     var galaxy_radius_ly = 50000;
-    var ly_to_m = 9.4605284 * Math.pow(10, 15);
 
     for (var i = 0; i < numStars; ++i)
     {
-        var d = (avg_star_distance + Noise.stream() * star_distance_deviation) * ly_to_m;
+        var d = ly_to_m(AVG_STAR_DIST + Noise.stream() * STAR_DIST_DEV);
         var x = (Noise.stream()*2-1);
         var y = (Noise.stream()*2-1);
         var z = (Noise.stream()*2-1);
         var radius = smallest_r + Noise.stream() * (largest_r - smallest_r);
-        console.log(x, y, z, radius);
 
         var starGeometry = new THREE.SphereGeometry(radius);
         var starMaterial = new THREE.MeshBasicMaterial({
