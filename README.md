@@ -28,4 +28,4 @@ How do I run the programs on my machine?
   in the root directory (or to localhost:8080 if you're using a server), 
   you should be able to navigate to the WebGL programs.
 
-*For Windows, open Git terminal as admin and just run `npm install; bower install`
+*For Windows, open Git terminal as admin and just run `npm install; bower install`.
