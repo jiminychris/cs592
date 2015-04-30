@@ -10,7 +10,7 @@ Navigate to http://jiminychris.com/cs592/.
 How do I run the programs on my machine?
 ----------------------------------------
 
-1. First, you'll need to clone the repository.
+1. Clone the repository.
 2. [Install node.js](https://nodejs.org/ "Node.js").
 3. Run `npm install -g bower` to
   [install bower](http://bower.io/ "Bower").
