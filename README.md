@@ -17,8 +17,7 @@ How do I run the programs on my machine?
 4. Run `npm install -g browserify` to
   [install browserify](http://browserify.org/ "Browserify").
 5. While in the root directory, run `sudo npm install; bower install`*.
-6. To build each program, go into each directory with an `index.html`
-  file and run the command `browserify js/index.js -o bundle.js`.
+6. Run `make` in the root directory+.
 7. Some of the programs will cause problems in Chrome because they 
   try to access the file system. I usually fix this by using a simple
   web server called 
@@ -28,4 +27,7 @@ How do I run the programs on my machine?
   in the root directory (or to localhost:8080 if you're using a server), 
   you should be able to navigate to the WebGL programs.
 
-*For Windows, open Git terminal as admin and just run `npm install; bower install`.
+*For Windows, open Git terminal as admin and just run `npm install; bower 
+install`.
++Alternatively, run `browserify js/index.js -o bundle.js in each individual 
+project directory.
