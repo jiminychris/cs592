@@ -30,5 +30,5 @@ How do I run the programs on my machine?
 *For Windows, open Git terminal as admin and just run `npm install; bower 
 install`.
 
-+Alternatively, run `browserify js/index.js -o bundle.js in each individual 
++Alternatively, run `browserify js/index.js -o bundle.js` in each individual 
 project directory.
